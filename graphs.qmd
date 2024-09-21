@@ -1,0 +1,320 @@
+---
+title: "Males in Women's Sports"
+format: html
+theme: cosmo
+execute:
+  echo: false
+  warning: false
+toc: true
+---
+
+
+The number of males competing in women's sports has increased exponentially in recent years. This document shows the breakdown by year and by sport.
+
+These are only the known male athletes. There are almost certainly other males competing in women's sports who have not been reported.
+
+Data from [HeCheated.org](https://www.hecheated.org)
+
+
+```{r}
+library(XML)
+library(dplyr)
+library(ggplot2)
+library(rcartocolor)
+library(forcats)
+library(glue)
+library(plotly)
+
+bar_color <- "darkblue"
+single_bar_color <- "skyblue"
+
+data_cutoff <- "September 2024"
+```
+
+
+```{r}
+main_url <- "https://www.hecheated.org"
+
+results_urls <- c()
+results_2020s_url <- "https://www.hecheated.org/totals_results" # 5149
+results_2010s_url <- "https://www.hecheated.org/totals_results_2010s" # 3307
+results_2000s_url <- "https://www.hecheated.org/totals_results_2000s" # 403
+results_1900s_url <- "https://www.hecheated.org/totals_results_1900s" # 53
+
+results_urls <- c(
+  results_2020s_url, results_2010s_url, results_2000s_url,
+  results_1900s_url
+)
+
+# Read in data
+all_results <- data.frame()
+
+for (url in results_urls) {
+  # print(url)
+
+  results_lines <- readLines(url, encoding = "UTF-8")
+
+  # length((readHTMLTable(results_lines)))
+  # names(readHTMLTable(results_lines))
+
+  results_html <- readHTMLTable(results_lines)
+
+  # Table has no caption, so set name
+  names(results_html) <- "results_table"
+
+  results_tab <- results_html$results_table
+  # print(nrow(results_tab))
+
+  all_results <- bind_rows(all_results, results_tab)
+}
+
+# Clean up table data
+all_results_sub <- all_results |>
+  filter(
+    YEAR != "n/a",
+    # Omit dates that are "1990s"
+    substr(DATE, 5, 5) != "s"
+  ) |>
+  # If YEAR is "1990s", take year from DATE
+  mutate(
+    YEAR = case_when(
+      substr(YEAR, 5, 5) == "s" ~ substr(DATE, 1, 4),
+      TRUE ~ YEAR
+    )
+  ) |>
+  mutate(
+    male_name = `MALE ATHLETE`,
+    YEAR = as.integer(YEAR),
+    place = `PLACE SORT`
+  )
+
+# Number of individual athletes
+n_males <- unique(all_results_sub$male_name) |> length() # 402
+
+max_year <- max(all_results_sub$YEAR, na.rm = TRUE) # 2024
+min_year <- min(all_results_sub$YEAR, na.rm = TRUE) # 1936
+
+
+# By year
+by_year <- all_results_sub |>
+  select(YEAR, male_name) %>%
+  distinct() |>
+  group_by(YEAR) |>
+  summarize(n = n()) |>
+  ungroup()
+
+# By sport
+by_sport <- all_results_sub |>
+  select(SPORT, male_name) %>%
+  distinct()
+```
+
+
+# By year
+
+<br>
+
+```{r}
+# Number of unique males competing each year
+p <- by_year |>
+  ggplot(aes(YEAR, n, 
+             text = paste0(YEAR, ": ", n, if_else(n == 1, " male", " males")))) +
+  geom_col(fill = bar_color) +
+  geom_col(
+    data = by_year |> filter(YEAR == max(YEAR, na.rm = FALSE)),
+    fill = single_bar_color
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Number of males",
+    caption = glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")
+  ) +
+  scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
+  ggtitle("Number of unique males, by year")
+
+ggplotly(p, tooltip = c("text")) |>
+  rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
+```
+
+
+<font size="2"> `r glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")` </font>
+
+
+<br>
+
+```{r}
+# Number of males finishing in top 3
+top3 <- all_results_sub |>
+  filter(place %in% c("1st", "2nd", "3rd")) |>
+  select(YEAR, male_name) %>%
+  distinct() |>
+  group_by(YEAR) |>
+  summarize(n = n()) |>
+  ungroup()
+
+p <- top3 |>
+  ggplot(aes(YEAR, n, 
+             text = paste0(YEAR, ": ", n, if_else(n == 1, " male", " males")))) +
+  geom_col(fill = bar_color) +
+  geom_col(
+    data = by_year |> filter(YEAR == max(YEAR, na.rm = FALSE)),
+    fill = single_bar_color
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Number of males",
+    caption = glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")
+  ) +
+  scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
+  ggtitle("Number of males finishing in top 3, by year")
+
+ggplotly(p, tooltip = c("text")) |>
+  rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
+```
+
+<font size="2"> `r glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")` </font>
+
+<br>
+
+```{r}
+# Number of events with a male competing, by year
+
+events_by_year <- all_results_sub |>
+  group_by(YEAR) |>
+  summarize(n = n()) |>
+  ungroup()
+
+p <- events_by_year |>
+  ggplot(aes(YEAR, n, 
+             text = paste0(YEAR, ": ", n, if_else(n == 1, " event", " events"))
+             )) +
+  geom_col(fill = bar_color) +
+  geom_col(
+    data = events_by_year |> filter(YEAR == max(YEAR, na.rm = FALSE)),
+    fill = single_bar_color
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Number of events",
+    caption = glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")
+  ) +
+  scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
+  ggtitle("Number of events with a male, by year")
+
+ggplotly(p, tooltip = c("text")) |>
+  rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
+```
+
+<font size="2"> `r glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")` </font>
+
+<br>
+
+```{r}
+#| fig-width: 9
+#| fig-height: 7
+
+# Number of events with a male competing by sport and year (top 10)
+top_ten_sports <- all_results_sub |>
+  group_by(SPORT) |>
+  summarize(n = n()) |>
+  ungroup() |>
+  arrange(desc(n)) |>
+  head(10) |>
+  pull(SPORT)
+
+color_pal <- carto_pal(11, "Safe")
+
+summ_top10 <- all_results_sub |>
+  mutate(
+    sport_cat = if_else(SPORT %in% top_ten_sports, SPORT, "Other")
+  ) |>
+  # Puts top sport at the bottom of the legend
+  mutate(sport_cat = fct_rev(factor(sport_cat, levels = c(top_ten_sports, "Other")))) |>
+  group_by(YEAR, sport_cat) |>
+  summarize(n = n()) |>
+  ungroup()
+
+
+p <- summ_top10 |>
+  ggplot(aes(YEAR,
+    fill = sport_cat, n,
+    text = paste0(YEAR, ": ", n, " ", sport_cat, if_else(n == 1, " event", " events"))
+  )) +
+  geom_col(color = "white") +
+  scale_fill_manual(values = color_pal) +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Number of events",
+    fill = "Sport" # ,
+    # caption = glue("2024 data is as of {data_cutoff}.")
+  ) +
+  scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
+  ggtitle("Number of events with a male, by sport and year (top 10 events)")
+
+ggplotly(p, tooltip = c("text")) |>
+  rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
+```
+
+<font size="2"> Note: `r glue("2024 data is as of {data_cutoff}.")` </font>
+
+<br>
+
+
+# By sport
+
+<br>
+
+```{r}
+#| fig-height: 10
+
+# Number of unique males competing by sport
+p <- by_sport |>
+  group_by(SPORT) %>%
+  summarize(n = n()) |>
+  ungroup() |>
+  ggplot(aes(
+    y = fct_reorder(SPORT, n), n,
+    text = paste0(SPORT, ": ", n, if_else(n == 1, " male", " males"))
+  )) +
+  geom_col(fill = bar_color) +
+  theme_minimal() +
+  labs(
+    y = "Sport",
+    x = "Number of males"
+  ) +
+  ggtitle(glue("Number of unique males, by sport ({min_year}-{max_year})"))
+
+ggplotly(p, tooltip = c("text"))
+```
+
+<br>
+
+```{r}
+#| fig-height: 10
+
+# Number of events with a male competing by sport
+p <- all_results_sub |>
+  group_by(SPORT) %>%
+  summarize(n = n()) |>
+  ungroup() |>
+  ggplot(aes(
+    y = fct_reorder(SPORT, n), n,
+    text = paste0(SPORT, ": ", n, if_else(n == 1, " event", " events"))
+  )) +
+  geom_col(fill = bar_color) +
+  theme_minimal() +
+  theme(axis.title.y = element_text(margin = margin(r = 200))) +
+  labs(
+    y = "Sport",
+    x = "Number of events"
+  ) +
+  ggtitle(glue("Number of events with a male, by sport ({min_year}-{max_year})"))
+
+ggplotly(p, tooltip = c("text"))
+```
+
+
