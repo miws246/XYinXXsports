@@ -291,6 +291,7 @@ p <- by_sport |>
 
 ggplotly(p, tooltip = c("text")) %>%
   layout(
+    # Move x axis title to top
     xaxis = list(side = "top", 
                  margin = list(t = 100, l = 100),
                  title = list(text = "Number of males",  standoff = 0)),
@@ -324,6 +325,7 @@ p <- all_results_sub |>
 
 ggplotly(p, tooltip = c("text")) %>%
   layout(
+    # Move x axis title to top
     xaxis = list(side = "top", 
                  margin = list(t = 100, l = 100),
                  title = list(text = "Number of events",  standoff = 0)),
