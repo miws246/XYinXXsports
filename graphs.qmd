@@ -282,13 +282,20 @@ p <- by_sport |>
   )) +
   geom_col(fill = bar_color) +
   theme_minimal() +
+  scale_x_continuous(position = "top") +
   labs(
     y = "Sport",
     x = "Number of males"
   ) +
   ggtitle(glue("Number of unique males, by sport ({min_year}-{max_year})"))
 
-ggplotly(p, tooltip = c("text"))
+ggplotly(p, tooltip = c("text")) %>%
+  layout(
+    xaxis = list(side = "top", 
+                 margin = list(t = 100, l = 100),
+                 title = list(text = "Number of males",  standoff = 0)),
+    margin = list(t = 150)
+         ) 
 ```
 
 <br>
@@ -308,13 +315,20 @@ p <- all_results_sub |>
   geom_col(fill = bar_color) +
   theme_minimal() +
   theme(axis.title.y = element_text(margin = margin(r = 200))) +
+  scale_x_continuous(position = "top") +
   labs(
     y = "Sport",
     x = "Number of events"
   ) +
   ggtitle(glue("Number of events with a male, by sport ({min_year}-{max_year})"))
 
-ggplotly(p, tooltip = c("text"))
+ggplotly(p, tooltip = c("text")) %>%
+  layout(
+    xaxis = list(side = "top", 
+                 margin = list(t = 100, l = 100),
+                 title = list(text = "Number of events",  standoff = 0)),
+    margin = list(t = 150)
+         ) 
 ```
 
 
