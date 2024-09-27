@@ -117,8 +117,9 @@ by_sport <- all_results_sub |>
 ```{r}
 # Number of unique males competing each year
 p <- by_year |>
-  ggplot(aes(YEAR, n, 
-             text = paste0(YEAR, ": ", n, if_else(n == 1, " male", " males")))) +
+  ggplot(aes(YEAR, n,
+    text = paste0(YEAR, ": ", n, if_else(n == 1, " male", " males"))
+  )) +
   geom_col(fill = bar_color) +
   geom_col(
     data = by_year |> filter(YEAR == max(YEAR, na.rm = FALSE)),
@@ -154,8 +155,9 @@ top3 <- all_results_sub |>
   ungroup()
 
 p <- top3 |>
-  ggplot(aes(YEAR, n, 
-             text = paste0(YEAR, ": ", n, if_else(n == 1, " male", " males")))) +
+  ggplot(aes(YEAR, n,
+    text = paste0(YEAR, ": ", n, if_else(n == 1, " male", " males"))
+  )) +
   geom_col(fill = bar_color) +
   geom_col(
     data = by_year |> filter(YEAR == max(YEAR, na.rm = FALSE)),
@@ -187,9 +189,9 @@ events_by_year <- all_results_sub |>
   ungroup()
 
 p <- events_by_year |>
-  ggplot(aes(YEAR, n, 
-             text = paste0(YEAR, ": ", n, if_else(n == 1, " event", " events"))
-             )) +
+  ggplot(aes(YEAR, n,
+    text = paste0(YEAR, ": ", n, if_else(n == 1, " event", " events"))
+  )) +
   geom_col(fill = bar_color) +
   geom_col(
     data = events_by_year |> filter(YEAR == max(YEAR, na.rm = FALSE)),
@@ -292,11 +294,13 @@ p <- by_sport |>
 ggplotly(p, tooltip = c("text")) %>%
   layout(
     # Move x axis title to top
-    xaxis = list(side = "top", 
-                 margin = list(t = 100, l = 100),
-                 title = list(text = "Number of males",  standoff = 0)),
+    xaxis = list(
+      side = "top",
+      margin = list(t = 100, l = 100),
+      title = list(text = "Number of males", standoff = 0)
+    ),
     margin = list(t = 150)
-         ) 
+  )
 ```
 
 <br>
@@ -326,11 +330,11 @@ p <- all_results_sub |>
 ggplotly(p, tooltip = c("text")) %>%
   layout(
     # Move x axis title to top
-    xaxis = list(side = "top", 
-                 margin = list(t = 100, l = 100),
-                 title = list(text = "Number of events",  standoff = 0)),
+    xaxis = list(
+      side = "top",
+      margin = list(t = 100, l = 100),
+      title = list(text = "Number of events", standoff = 0)
+    ),
     margin = list(t = 150)
-         ) 
+  )
 ```
-
-
