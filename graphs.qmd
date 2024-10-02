@@ -24,6 +24,9 @@ library(rcartocolor)
 library(forcats)
 library(glue)
 library(plotly)
+library(textshape)
+library(rvest)
+library(xml2)
 
 bar_color <- "darkblue"
 single_bar_color <- "skyblue"
@@ -32,11 +35,11 @@ data_cutoff <- "September 2024"
 ```
 
 
-```{r}
+```{r read-results}
 main_url <- "https://www.hecheated.org"
 
 results_urls <- c()
-results_2020s_url <- "https://www.hecheated.org/totals_results" # 5149
+results_2020s_url <- "https://www.hecheated.org/totals_results_2020s" # 5149
 results_2010s_url <- "https://www.hecheated.org/totals_results_2010s" # 3307
 results_2000s_url <- "https://www.hecheated.org/totals_results_2000s" # 403
 results_1900s_url <- "https://www.hecheated.org/totals_results_1900s" # 53
@@ -45,6 +48,8 @@ results_urls <- c(
   results_2020s_url, results_2010s_url, results_2000s_url,
   results_1900s_url
 )
+
+# TODO Exclude DNS. See email
 
 # Read in data
 all_results <- data.frame()
@@ -110,6 +115,36 @@ by_sport <- all_results_sub |>
 ```
 
 
+```{r read-athletes}
+
+athletes_url <- "https://www.hecheated.org/totals_athletes"
+
+athletes_html <- read_html(athletes_url)
+
+# List of names of sports
+sports <- html_elements(athletes_html, ".athlete-list h3") %>%  html_text2()
+
+# List of sports and athletes
+sports_and_names <- html_elements(
+  athletes_html, 
+  "div.athlete-list h3, div.athlete-list li"
+  ) %>%  
+  html_text2()
+
+# Split out the athletes by sports
+sports_list <- split_match(sports_and_names, split = sports)
+names(sports_list) <- sports
+
+# Create a data frame
+athletes_df <- stack(sports_list) |>
+  rename(
+    name = values, 
+    SPORT = ind
+  ) %>%
+  filter(SPORT != "Unnamed Athletes") 
+```
+  
+  
 # By year
 
 <br>
@@ -274,7 +309,7 @@ ggplotly(p, tooltip = c("text")) |>
 #| fig-height: 10
 
 # Number of unique males competing by sport
-p <- by_sport |>
+p <- athletes_df |>
   group_by(SPORT) %>%
   summarize(n = n()) |>
   ungroup() |>
