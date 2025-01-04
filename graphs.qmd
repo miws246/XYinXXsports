@@ -31,7 +31,7 @@ library(xml2)
 bar_color <- "darkblue"
 single_bar_color <- "skyblue"
 
-data_cutoff <- "October 2024"
+data_cutoff <- Sys.Date()
 ```
 
 
@@ -164,7 +164,7 @@ p <- by_year |>
   labs(
     x = "Year",
     y = "Number of males",
-    caption = glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")
+    caption = glue("Note: {max_year} data is as of {data_cutoff} and is in light blue.")
   ) +
   scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
   ggtitle("Number of unique males, by year")
@@ -174,7 +174,7 @@ ggplotly(p, tooltip = c("text")) |>
 ```
 
 
-<font size="2"> `r glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")` </font>
+<font size="2"> `r glue("Note: {max_year} data is as of {data_cutoff} and is in light blue.")` </font>
 
 
 <br>
@@ -202,7 +202,7 @@ p <- top3 |>
   labs(
     x = "Year",
     y = "Number of males",
-    caption = glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")
+    caption = glue("Note: {max_year} data is as of {data_cutoff} and is in light blue.")
   ) +
   scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
   ggtitle("Number of males finishing in top 3, by year")
@@ -211,7 +211,7 @@ ggplotly(p, tooltip = c("text")) |>
   rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
 ```
 
-<font size="2"> `r glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")` </font>
+<font size="2"> `r glue("Note: {max_year} data is as of {data_cutoff} and is in light blue.")` </font>
 
 <br>
 
@@ -236,7 +236,7 @@ p <- events_by_year |>
   labs(
     x = "Year",
     y = "Number of events",
-    caption = glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")
+    caption = glue("Note: {max_year} data is as of {data_cutoff} and is in light blue.")
   ) +
   scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
   ggtitle("Number of events with a male, by year")
@@ -245,7 +245,7 @@ ggplotly(p, tooltip = c("text")) |>
   rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
 ```
 
-<font size="2"> `r glue("Note: 2024 data is as of {data_cutoff} and is in light blue.")` </font>
+<font size="2"> `r glue("Note: {max_year} data is as of {data_cutoff} and is in light blue.")` </font>
 
 <br>
 
@@ -287,7 +287,7 @@ p <- summ_top10 |>
     x = "Year",
     y = "Number of events",
     fill = "Sport" # ,
-    # caption = glue("2024 data is as of {data_cutoff}.")
+    # caption = glue("{max_year} data is as of {data_cutoff}.")
   ) +
   scale_x_continuous(breaks = c(seq(1930, 2030, by = 10))) +
   ggtitle("Number of events with a male, by sport and year (top 10 events)")
@@ -296,7 +296,7 @@ ggplotly(p, tooltip = c("text")) |>
   rangeslider(start = min_year - 1, end = max_year + 1, thickness = 0.1)
 ```
 
-<font size="2"> Note: `r glue("2024 data is as of {data_cutoff}.")` </font>
+<font size="2"> Note: `r glue("{max_year} data is as of {data_cutoff}.")` </font>
 
 <br>
 
