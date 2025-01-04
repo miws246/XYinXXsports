@@ -318,18 +318,14 @@ p <- athletes_df |>
     text = paste0(SPORT, ": ", n, if_else(n == 1, " male", " males"))
   )) +
   geom_col(fill = bar_color, width = 0.75) +
+  geom_text(aes(label = n), hjust = -0.1, size = 3) +
   theme_minimal() +
-  theme(#plot.margin = unit(c(1, 0, 0, 0), "cm"),
-        axis.title.y.left = element_text(angle = 0,
+  theme(axis.title.y.left = element_text(angle = 0,
                                          vjust = 1.02,
                                          hjust = 1,
-                                         # hjust = 0.5,
-                                         # color = "#ffc000",
-                                         # margin = margin(r = -30, l = 10)
                                          margin = margin(r = -30, l = 10)
                                          )
         ) +
-  # theme(axis.title.y = element_text(margin = margin(r = 200))) +
   scale_x_continuous(position = "top") +
   labs(
     y = "Sport",
@@ -365,18 +361,14 @@ p <- all_results_sub |>
     text = paste0(SPORT, ": ", n, if_else(n == 1, " event", " events"))
   )) +
   geom_col(fill = bar_color, width = 0.75) +
+  geom_text(aes(label = n), hjust = -0.2, size = 3) +
   theme_minimal() +
-  theme(#plot.margin = unit(c(1, 0, 0, 0), "cm"),
-        axis.title.y.left = element_text(angle = 0,
+  theme(axis.title.y.left = element_text(angle = 0,
                                          vjust = 1.02,
                                          hjust = 1,
-                                         # hjust = 0.5,
-                                         # color = "#ffc000",
-                                         # margin = margin(r = -30, l = 10)
                                          margin = margin(r = -30, l = 10)
                                          )
         ) +
-  # theme(axis.title.y = element_text(margin = margin(r = 200))) +
   scale_x_continuous(position = "top") +
   labs(
     y = "Sport",
