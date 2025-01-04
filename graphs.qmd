@@ -369,7 +369,8 @@ p <- all_results_sub |>
                                          margin = margin(r = -30, l = 10)
                                          )
         ) +
-  scale_x_continuous(position = "top") +
+  scale_x_continuous(position = "top", limits = c(NA, 2600),
+                     breaks = seq(0, 2600, 500)) +
   labs(
     y = "Sport",
     x = "Number of events"
