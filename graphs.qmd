@@ -77,6 +77,7 @@ for (url in results_urls) {
 all_results_sub <- all_results |>
   filter(
     YEAR != "n/a",
+    !SPORT %in% c("n/a", ""),
     # Omit dates that are "1990s"
     substr(DATE, 5, 5) != "s"
   ) |>
