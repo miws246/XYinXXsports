@@ -317,8 +317,19 @@ p <- athletes_df |>
     y = fct_reorder(SPORT, n), n,
     text = paste0(SPORT, ": ", n, if_else(n == 1, " male", " males"))
   )) +
-  geom_col(fill = bar_color) +
+  geom_col(fill = bar_color, width = 0.75) +
   theme_minimal() +
+  theme(#plot.margin = unit(c(1, 0, 0, 0), "cm"),
+        axis.title.y.left = element_text(angle = 0,
+                                         vjust = 1.02,
+                                         hjust = 1,
+                                         # hjust = 0.5,
+                                         # color = "#ffc000",
+                                         # margin = margin(r = -30, l = 10)
+                                         margin = margin(r = -30, l = 10)
+                                         )
+        ) +
+  # theme(axis.title.y = element_text(margin = margin(r = 200))) +
   scale_x_continuous(position = "top") +
   labs(
     y = "Sport",
@@ -326,22 +337,23 @@ p <- athletes_df |>
   ) +
   ggtitle(glue("Number of unique males, by sport ({min_year}-{max_year})"))
 
-ggplotly(p, tooltip = c("text")) %>%
-  layout(
-    # Move x axis title to top
-    xaxis = list(
-      side = "top",
-      margin = list(t = 100, l = 100),
-      title = list(text = "Number of males", standoff = 0)
-    ),
-    margin = list(t = 150)
-  )
+p
+# ggplotly(p, tooltip = c("text")) %>%
+#   layout(
+#     # Move x axis title to top
+#     xaxis = list(
+#       side = "top",
+#       margin = list(t = 100, l = 100),
+#       title = list(text = "Number of males", standoff = 0)
+#     ),
+#     margin = list(t = 150)
+#   )
 ```
 
 <br>
 
 ```{r}
-#| fig-height: 10
+#| fig-height: 12
 
 # Number of events with a male competing by sport
 p <- all_results_sub |>
@@ -352,9 +364,19 @@ p <- all_results_sub |>
     y = fct_reorder(SPORT, n), n,
     text = paste0(SPORT, ": ", n, if_else(n == 1, " event", " events"))
   )) +
-  geom_col(fill = bar_color) +
+  geom_col(fill = bar_color, width = 0.75) +
   theme_minimal() +
-  theme(axis.title.y = element_text(margin = margin(r = 200))) +
+  theme(#plot.margin = unit(c(1, 0, 0, 0), "cm"),
+        axis.title.y.left = element_text(angle = 0,
+                                         vjust = 1.02,
+                                         hjust = 1,
+                                         # hjust = 0.5,
+                                         # color = "#ffc000",
+                                         # margin = margin(r = -30, l = 10)
+                                         margin = margin(r = -30, l = 10)
+                                         )
+        ) +
+  # theme(axis.title.y = element_text(margin = margin(r = 200))) +
   scale_x_continuous(position = "top") +
   labs(
     y = "Sport",
@@ -362,14 +384,15 @@ p <- all_results_sub |>
   ) +
   ggtitle(glue("Number of events with a male, by sport ({min_year}-{max_year})"))
 
-ggplotly(p, tooltip = c("text")) %>%
-  layout(
-    # Move x axis title to top
-    xaxis = list(
-      side = "top",
-      margin = list(t = 100, l = 100),
-      title = list(text = "Number of events", standoff = 0)
-    ),
-    margin = list(t = 150)
-  )
+p
+# ggplotly(p, tooltip = c("text")) %>%
+#   layout(
+#     # Move x axis title to top
+#     xaxis = list(
+#       side = "top",
+#       margin = list(t = 100, l = 100),
+#       title = list(text = "Number of events", standoff = 0)
+#     ),
+#     margin = list(t = 150)
+#   )
 ```
